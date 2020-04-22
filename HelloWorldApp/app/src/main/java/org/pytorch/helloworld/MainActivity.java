@@ -1,17 +1,13 @@
 package org.pytorch.helloworld;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.pytorch.IValue;
 import org.pytorch.Module;
 import org.pytorch.Tensor;
-import org.pytorch.torchvision.TensorImageUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,49 +24,29 @@ public class MainActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    Bitmap bitmap = null;
     Module module = null;
     try {
-      // creating bitmap from packaged into app android asset 'image.jpg',
-      // app/src/main/assets/image.jpg
-      bitmap = BitmapFactory.decodeStream(getAssets().open("image.jpg"));
-      // loading serialized torchscript module from packaged into app android asset model.pt,
-      // app/src/model/assets/model.pt
-      module = Module.load(assetFilePath(this, "model.pt"));
+      module = Module.load(assetFilePath(this, "script_model.pt"));
     } catch (IOException e) {
       Log.e("PytorchHelloWorld", "Error reading assets", e);
       finish();
     }
 
-    // showing image on UI
-    ImageView imageView = findViewById(R.id.image);
-    imageView.setImageBitmap(bitmap);
-
-    // preparing input tensor
-    final Tensor inputTensor = TensorImageUtils.bitmapToFloat32Tensor(bitmap,
-        TensorImageUtils.TORCHVISION_NORM_MEAN_RGB, TensorImageUtils.TORCHVISION_NORM_STD_RGB);
-
-    // running the model
-    final Tensor outputTensor = module.forward(IValue.from(inputTensor)).toTensor();
-
-    // getting tensor content as java array of floats
-    final float[] scores = outputTensor.getDataAsFloatArray();
-
-    // searching for the index with maximum score
-    float maxScore = -Float.MAX_VALUE;
-    int maxScoreIdx = -1;
-    for (int i = 0; i < scores.length; i++) {
-      if (scores[i] > maxScore) {
-        maxScore = scores[i];
-        maxScoreIdx = i;
-      }
-    }
-
-    String className = ImageNetClasses.IMAGENET_CLASSES[maxScoreIdx];
-
-    // showing className on UI
     TextView textView = findViewById(R.id.text);
-    textView.setText(className);
+    long startTime = System.nanoTime();
+    int numSamples = 10000;
+    for (int i = 0; i < numSamples; i++)
+    {
+      final long[] shape = {35};
+      final Tensor inputTensor = Tensor.fromBlob(Tensor.allocateDoubleBuffer(35), shape);
+
+      final Tensor outputTensor = module.forward(IValue.from(inputTensor)).toTensor();
+    }
+    long endTime = System.nanoTime();
+    long nanoToMilli = 1000000;
+    long elapsedTime = (endTime - startTime) / (nanoToMilli);
+    textView.setText("Time to run " + Integer.toString(numSamples) + " samples: " + Long.toString(elapsedTime) + " milliseconds" );
+
   }
 
   /**
