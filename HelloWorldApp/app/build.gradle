@@ -2,6 +2,10 @@ apply plugin: 'com.android.application'
 
 repositories {
     jcenter()
+    ivy {
+        url "https://mbientlab.com/releases/ivyrep"
+        layout "gradle"
+    }
 }
 
 android {
@@ -19,10 +23,15 @@ android {
             minifyEnabled false
         }
     }
+    compileOptions {
+        targetCompatibility = 1.8
+        sourceCompatibility = 1.8
+    }
 }
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'org.pytorch:pytorch_android:1.4.0'
     implementation 'org.pytorch:pytorch_android_torchvision:1.4.0'
+    implementation 'com.mbientlab:metawear:3.7.0'
 }
