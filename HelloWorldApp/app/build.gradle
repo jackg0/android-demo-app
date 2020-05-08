@@ -17,6 +17,9 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
+
+        renderscriptTargetApi 18
+        renderscriptSupportModeEnabled true
     }
     buildTypes {
         release {
@@ -34,4 +37,5 @@ dependencies {
     implementation 'org.pytorch:pytorch_android:1.4.0'
     implementation 'org.pytorch:pytorch_android_torchvision:1.4.0'
     implementation 'com.mbientlab:metawear:3.7.0'
+    implementation 'org.apache.commons:commons-math3:3.6.1'
 }
